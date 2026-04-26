@@ -4,6 +4,30 @@ Streamable HTTP proxy for stdio MCP servers with per-request API key injection v
 
 Pass API keys as HTTP headers — the proxy maps them to environment variables and manages a pool of child processes. Different keys get isolated processes. No race conditions. No restarts.
 
+## Why This Exists
+
+Most stdio MCP servers read credentials from environment variables (e.g. `BRAVE_API_KEY`, `GITHUB_TOKEN`). That works fine locally, but when you deploy them as shared HTTP services, you need each user to bring their own key — passed per-request via an HTTP header, not baked into the container.
+
+We evaluated every existing MCP proxy and gateway. None of them support all four requirements at once:
+
+| Project | Streamable HTTP | Header-to-env | Process pool + TTL | Multi-tenant safe |
+|---------|:-:|:-:|:-:|:-:|
+| [supergateway](https://github.com/supercorp-ai/supergateway) | Yes | No | No (single child) | No |
+| [IBM mcp-context-forge](https://github.com/IBM/mcp-context-forge) | No (SSE only) | Yes | No (restarts single child) | No (race condition) |
+| [mcp-streamablehttp-proxy](https://github.com/atrawog/mcp-streamablehttp-proxy) | Yes | No | 1:1 session:process | Partial (static env) |
+| [mcp-front](https://github.com/stainless-api/mcp-front) (Stainless) | No (SSE only) | Yes (`$userToken`) | No pool/TTL | Yes |
+| [mcp-proxy](https://github.com/punkpeye/mcp-proxy) | Yes | No | No | No |
+| [mcp-auth](https://github.com/prmichaelsen/mcp-auth) | SSE/HTTP | Via token resolver | No | Yes (JWT) |
+| **mcp-key-proxy** | **Yes** | **Yes** | **Yes** | **Yes** |
+
+- **supergateway**: No header-to-env. One shared child process for everyone.
+- **IBM mcp-context-forge**: Header-to-env exists but only on the SSE code path. Streamable HTTP ignores headers entirely. Also restarts the single child on every request — race condition when two users connect.
+- **mcp-streamablehttp-proxy**: Per-session subprocess, but no way to inject headers as env vars. Every child gets the same static environment.
+- **mcp-front**: Per-user isolation with token injection, but SSE-only transport and requires full OAuth/OIDC setup. Marked v0.0.1-DEV.
+- **mcp-proxy / mcp-auth**: Either missing header-to-env, or require programmatic wrappers instead of a drop-in CLI.
+
+mcp-key-proxy fills the gap: Streamable HTTP + header-to-env + keyed process pool + multi-tenant isolation. One command, no code changes to your MCP server.
+
 ## Quick Start: Brave Search MCP
 
 **docker-compose.yml**
