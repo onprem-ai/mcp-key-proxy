@@ -119,6 +119,115 @@ curl -X POST http://localhost:8000/mcp \
   }'
 ```
 
+## Examples
+
+### 1. Brave Search MCP
+
+See [Quick Start](#quick-start-brave-search-mcp) above.
+
+### 2. Filesystem MCP Server
+
+```yaml
+services:
+  filesystem-mcp:
+    image: ghcr.io/digilac/mcp-key-proxy:latest
+    command:
+      - "--stdio"
+      - "npx -y @modelcontextprotocol/server-filesystem /data"
+      - "--header-to-env"
+      - "x-api-key=API_KEY"
+      - "--port"
+      - "8000"
+      - "--host"
+      - "0.0.0.0"
+      - "--pool-size"
+      - "3"
+      - "--ttl"
+      - "600"
+      - "--cors"
+      - "*"
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./shared-data:/data
+```
+
+The filesystem MCP server gets access to `/data` inside the container. Mount any host directory to expose it. The `x-api-key` header acts as a simple access gate — the proxy rejects requests without it.
+
+### 3. Multi-server stack
+
+Run multiple MCP servers behind different ports, all using the same generic image:
+
+```yaml
+services:
+  # Brave Search — API key per user
+  brave-search:
+    image: ghcr.io/digilac/mcp-key-proxy:latest
+    command:
+      - "--stdio"
+      - "npx -y @brave/brave-search-mcp-server"
+      - "--header-to-env"
+      - "x-api-key=BRAVE_API_KEY"
+      - "--port"
+      - "8000"
+      - "--host"
+      - "0.0.0.0"
+      - "--pool-size"
+      - "5"
+      - "--ttl"
+      - "300"
+      - "--cors"
+      - "*"
+    ports:
+      - "8001:8000"
+
+  # GitHub MCP — token per user
+  github:
+    image: ghcr.io/digilac/mcp-key-proxy:latest
+    command:
+      - "--stdio"
+      - "npx -y @modelcontextprotocol/server-github"
+      - "--header-to-env"
+      - "x-github-token=GITHUB_PERSONAL_ACCESS_TOKEN"
+      - "--port"
+      - "8000"
+      - "--host"
+      - "0.0.0.0"
+      - "--pool-size"
+      - "3"
+      - "--ttl"
+      - "600"
+      - "--cors"
+      - "*"
+    ports:
+      - "8002:8000"
+
+  # Filesystem — shared docs
+  filesystem:
+    image: ghcr.io/digilac/mcp-key-proxy:latest
+    command:
+      - "--stdio"
+      - "npx -y @modelcontextprotocol/server-filesystem /data"
+      - "--header-to-env"
+      - "x-api-key=ACCESS_KEY"
+      - "--port"
+      - "8000"
+      - "--host"
+      - "0.0.0.0"
+      - "--pool-size"
+      - "2"
+      - "--ttl"
+      - "300"
+      - "--cors"
+      - "*"
+    ports:
+      - "8003:8000"
+    volumes:
+      - ./docs:/data:ro
+```
+
+Same image, different MCP servers. Each service gets its own header-to-env mapping and pool configuration. Put nginx or Caddy in front for TLS and routing.
+
 ## How It Works
 
 ```
