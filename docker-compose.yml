@@ -5,7 +5,7 @@ services:
       - "--stdio"
       - "brave-search-mcp-server"
       - "--header-to-env"
-      - "x-brave-api-key=BRAVE_API_KEY"
+      - "x-api-key=BRAVE_API_KEY"
       - "--port"
       - "8000"
       - "--host"
