@@ -13,7 +13,7 @@ The generic `mcp-key-proxy` Docker image wraps any stdio MCP server. Only two fl
 ```yaml
 services:
   brave-mcp:
-    image: ghcr.io/digilac/mcp-key-proxy:latest
+    image: ghcr.io/onprem-ai/mcp-key-proxy:latest
     command:
       - "--stdio"
       - "npx -y @brave/brave-search-mcp-server"
@@ -30,7 +30,7 @@ That's it. Clients send `x-api-key: <their-brave-key>` — the proxy injects it 
 ```yaml
 services:
   brave-mcp:
-    image: ghcr.io/digilac/mcp-key-proxy:latest
+    image: ghcr.io/onprem-ai/mcp-key-proxy:latest
     command:
       # The stdio MCP server to wrap — npx pulls it on first start
       - "--stdio"
@@ -160,7 +160,7 @@ See [Quick Start](#quick-start-brave-search-mcp) above.
 ```yaml
 services:
   filesystem-mcp:
-    image: ghcr.io/digilac/mcp-key-proxy:latest
+    image: ghcr.io/onprem-ai/mcp-key-proxy:latest
     command:
       - "--stdio"
       - "npx -y @modelcontextprotocol/server-filesystem /data"
@@ -192,7 +192,7 @@ Run multiple MCP servers behind different ports, all using the same generic imag
 services:
   # Brave Search — API key per user
   brave-search:
-    image: ghcr.io/digilac/mcp-key-proxy:latest
+    image: ghcr.io/onprem-ai/mcp-key-proxy:latest
     command:
       - "--stdio"
       - "npx -y @brave/brave-search-mcp-server"
@@ -213,7 +213,7 @@ services:
 
   # GitHub MCP — token per user
   github:
-    image: ghcr.io/digilac/mcp-key-proxy:latest
+    image: ghcr.io/onprem-ai/mcp-key-proxy:latest
     command:
       - "--stdio"
       - "npx -y @modelcontextprotocol/server-github"
@@ -234,7 +234,7 @@ services:
 
   # Filesystem — shared docs
   filesystem:
-    image: ghcr.io/digilac/mcp-key-proxy:latest
+    image: ghcr.io/onprem-ai/mcp-key-proxy:latest
     command:
       - "--stdio"
       - "npx -y @modelcontextprotocol/server-filesystem /data"

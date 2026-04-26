@@ -56,5 +56,5 @@ jobs:
           context: .
           push: true
           tags: |
-            ghcr.io/digilac/mcp-key-proxy:${{ steps.version.outputs.VERSION }}
-            ghcr.io/digilac/mcp-key-proxy:latest
+            ghcr.io/onprem-ai/mcp-key-proxy:${{ steps.version.outputs.VERSION }}
+            ghcr.io/onprem-ai/mcp-key-proxy:latest
