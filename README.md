@@ -1,10 +1,12 @@
 # mcp-key-proxy
 
+[![CI](https://github.com/onprem-ai/mcp-key-proxy/actions/workflows/ci.yml/badge.svg)](https://github.com/onprem-ai/mcp-key-proxy/actions/workflows/ci.yml)
+
 Streamable HTTP proxy for stdio MCP servers with per-request API key injection via headers.
 
 Pass API keys as HTTP headers — the proxy maps them to environment variables and manages a pool of child processes. Different keys get isolated processes. No race conditions. No restarts.
 
-## Quick Start: Brave Search MCP
+## Quick Start
 
 The generic `mcp-key-proxy` Docker image wraps any stdio MCP server. Only two flags are required — everything else has sensible defaults:
 
@@ -153,7 +155,7 @@ command:
 
 ### 1. Brave Search MCP
 
-See [Quick Start](#quick-start-brave-search-mcp) above.
+See [Quick Start](#quick-start) above.
 
 ### 2. Filesystem MCP Server
 
@@ -342,15 +344,18 @@ curl http://localhost:8000/health
 
 ## Without Docker
 
-```bash
-# Install
-npm install -g mcp-key-proxy
+Run directly from GitHub — no npm registry needed:
 
-# Or run directly
-npx mcp-key-proxy \
-  --stdio "brave-search-mcp-server" \
-  --header-to-env "x-api-key=BRAVE_API_KEY" \
-  --port 8000
+```bash
+# Latest version
+npx github:onprem-ai/mcp-key-proxy \
+  --stdio "npx -y @brave/brave-search-mcp-server" \
+  --header-to-env "x-api-key=BRAVE_API_KEY"
+
+# Pinned version
+npx github:onprem-ai/mcp-key-proxy#v0.1.0 \
+  --stdio "npx -y @brave/brave-search-mcp-server" \
+  --header-to-env "x-api-key=BRAVE_API_KEY"
 ```
 
 ## Development
