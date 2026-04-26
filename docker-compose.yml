@@ -1,0 +1,26 @@
+services:
+  brave-mcp:
+    build: .
+    command:
+      - "--stdio"
+      - "brave-search-mcp-server"
+      - "--header-to-env"
+      - "x-brave-api-key=BRAVE_API_KEY"
+      - "--port"
+      - "8000"
+      - "--host"
+      - "0.0.0.0"
+      - "--pool-size"
+      - "3"
+      - "--ttl"
+      - "300"
+      - "--cors"
+      - "*"
+      - "--debug"
+    ports:
+      - "9300:8000"
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://localhost:8000/health').then(r=>{if(!r.ok)throw 1})"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
