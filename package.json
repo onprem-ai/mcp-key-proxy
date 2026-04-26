@@ -1,0 +1,41 @@
+{
+  "name": "mcp-apikey-proxy",
+  "version": "0.1.0",
+  "description": "Streamable HTTP proxy for stdio MCP servers with per-request API key injection via headers",
+  "type": "module",
+  "bin": {
+    "mcp-apikey-proxy": "./dist/cli.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/cli.js",
+    "dev": "tsx src/cli.ts",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "typecheck": "tsc --noEmit",
+    "lint": "prettier --check src/ tests/",
+    "format": "prettier --write src/ tests/"
+  },
+  "keywords": ["mcp", "proxy", "api-key", "stdio", "streamable-http"],
+  "license": "MIT",
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "commander": "^13.1.0",
+    "cors": "^2.8.5",
+    "express": "^5.1.0",
+    "generic-pool": "^3.9.0",
+    "uuid": "^11.1.0"
+  },
+  "devDependencies": {
+    "@types/cors": "^2.8.17",
+    "@types/express": "^5.0.2",
+    "@types/node": "^22.15.3",
+    "@types/uuid": "^10.0.0",
+    "prettier": "^3.5.3",
+    "tsx": "^4.19.4",
+    "typescript": "^5.8.3",
+    "vitest": "^3.1.3"
+  }
+}
