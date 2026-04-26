@@ -129,7 +129,7 @@ curl -X POST http://localhost:8000/mcp \
 Works with any stdio MCP server — just change `--stdio` and `--header-to-env`. Arguments for the wrapped server go right in the `--stdio` string:
 
 ```yaml
-# GitHub MCP server
+# GitHub MCP server — token per user
 command:
   - "--stdio"
   - "npx -y @modelcontextprotocol/server-github"
@@ -142,13 +142,15 @@ command:
   - "npx -y @modelcontextprotocol/server-filesystem /data"
   - "--header-to-env"
   - "x-api-key=API_KEY"
+```
 
-# Any server with multiple flags
+`--header-to-env` is optional. Without it, the proxy wraps a stdio server as Streamable HTTP with process pooling but no key injection:
+
+```yaml
+# Zefix (Swiss company registry) — no API key needed
 command:
   - "--stdio"
-  - "my-mcp-server --verbose --port 9000 --model gpt-4"
-  - "--header-to-env"
-  - "x-api-key=API_KEY"
+  - "npx -y zefix-mcp-unofficial"
 ```
 
 ## Examples
@@ -290,7 +292,7 @@ Client (POST /mcp)              mcp-key-proxy              stdio MCP server
 | Flag | Default | Description |
 |------|---------|-------------|
 | `--stdio <cmd>` | *(required)* | Command to spawn the stdio MCP server |
-| `--header-to-env <mapping>` | *(required)* | `Header-Name=ENV_VAR` mapping. Repeatable. |
+| `--header-to-env <mapping>` | *(none)* | `Header-Name=ENV_VAR` mapping. Repeatable. Without it, all requests share one pool. |
 | `--port <n>` | 8000 | HTTP listen port |
 | `--host <s>` | 0.0.0.0 | Bind address |
 | `--pool-size <n>` | 5 | Max processes per API key |

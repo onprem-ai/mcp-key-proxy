@@ -35,6 +35,10 @@ export function extractHeaders(
   headers: IncomingHttpHeaders,
   mappings: HeaderMapping[],
 ): ExtractResult {
+  if (mappings.length === 0) {
+    return { envVars: {}, poolKey: "shared" };
+  }
+
   const envVars: Record<string, string> = {};
 
   for (const { headerName, envVar } of mappings) {

@@ -15,7 +15,7 @@ program
   )
   .version("0.1.0")
   .requiredOption("--stdio <command>", "Shell command to spawn the stdio MCP server")
-  .requiredOption(
+  .option(
     "--header-to-env <mapping>",
     "Header→env mapping (Header-Name=ENV_VAR). Repeatable.",
     (val: string, prev: string[]) => [...prev, val],
@@ -51,8 +51,7 @@ try {
 }
 
 if (headerMappings.length === 0) {
-  console.error("At least one --header-to-env mapping is required");
-  process.exit(1);
+  log.info("no --header-to-env mappings: all requests share a single process pool");
 }
 
 const config: Config = {

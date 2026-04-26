@@ -20,7 +20,7 @@
   "keywords": ["mcp", "proxy", "api-key", "stdio", "streamable-http"],
   "license": "MIT",
   "engines": {
-    "node": ">=20"
+    "node": ">=24"
   },
   "dependencies": {
     "commander": "^13.1.0",
