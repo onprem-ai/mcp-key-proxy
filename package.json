@@ -1,10 +1,10 @@
 {
-  "name": "mcp-apikey-proxy",
+  "name": "mcp-key-proxy",
   "version": "0.1.0",
   "description": "Streamable HTTP proxy for stdio MCP servers with per-request API key injection via headers",
   "type": "module",
   "bin": {
-    "mcp-apikey-proxy": "./dist/cli.js"
+    "mcp-key-proxy": "./dist/cli.js"
   },
   "scripts": {
     "build": "tsc",

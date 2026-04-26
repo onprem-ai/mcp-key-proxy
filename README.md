@@ -1,4 +1,4 @@
-# mcp-apikey-proxy
+# mcp-key-proxy
 
 Streamable HTTP proxy for stdio MCP servers with per-request API key injection via headers.
 
@@ -13,7 +13,7 @@ services:
   brave-mcp:
     build: .
     # Or use a pre-built image:
-    # image: ghcr.io/your-org/mcp-apikey-proxy:latest
+    # image: ghcr.io/your-org/mcp-key-proxy:latest
     command:
       # The stdio MCP server to wrap
       - "--stdio"
@@ -86,7 +86,7 @@ curl -X POST http://localhost:8000/mcp \
 ## How It Works
 
 ```
-Client (POST /mcp)              mcp-apikey-proxy              stdio MCP server
+Client (POST /mcp)              mcp-key-proxy              stdio MCP server
   │                                │                              │
   │  x-api-key: key-A             │                              │
   │ ──────────────────────────────►│                              │
@@ -169,10 +169,10 @@ curl http://localhost:8000/health
 
 ```bash
 # Install
-npm install -g mcp-apikey-proxy
+npm install -g mcp-key-proxy
 
 # Or run directly
-npx mcp-apikey-proxy \
+npx mcp-key-proxy \
   --stdio "brave-search-mcp-server" \
   --header-to-env "x-api-key=BRAVE_API_KEY" \
   --port 8000

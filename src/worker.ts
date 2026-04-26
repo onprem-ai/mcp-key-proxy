@@ -86,7 +86,7 @@ export class Worker {
       params: {
         protocolVersion: "2024-11-05",
         capabilities: {},
-        clientInfo: { name: "mcp-apikey-proxy", version: "0.1.0" },
+        clientInfo: { name: "mcp-key-proxy", version: "0.1.0" },
       },
     });
     // Send initialized notification

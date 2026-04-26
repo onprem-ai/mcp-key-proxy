@@ -1,4 +1,4 @@
-# mcp-apikey-proxy Design Spec
+# mcp-key-proxy Design Spec
 
 **Date**: 2026-04-26
 **Status**: Approved
@@ -20,7 +20,7 @@ A TypeScript CLI tool that bridges HTTP clients to stdio MCP servers. Incoming H
 Single command, no subcommands, no config files.
 
 ```bash
-npx mcp-apikey-proxy \
+npx mcp-key-proxy \
   --stdio "brave-search-mcp-server" \
   --header-to-env "X-Brave-Api-Key=BRAVE_API_KEY" \
   --port 8000 \
@@ -212,7 +212,7 @@ Note: We do NOT depend on `@modelcontextprotocol/sdk`. The proxy speaks raw JSON
 ## File Structure
 
 ```
-mcp-apikey-proxy/
+mcp-key-proxy/
 ├── src/
 │   ├── cli.ts
 │   ├── server.ts

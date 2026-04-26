@@ -9,7 +9,7 @@ import type { Config } from "./types.js";
 const program = new Command();
 
 program
-  .name("mcp-apikey-proxy")
+  .name("mcp-key-proxy")
   .description(
     "Streamable HTTP proxy for stdio MCP servers with per-request API key injection via headers",
   )
@@ -70,7 +70,7 @@ const config: Config = {
 const { app, poolManager } = createApp(config);
 
 const server = app.listen(config.port, config.host, () => {
-  log.info("mcp-apikey-proxy started", {
+  log.info("mcp-key-proxy started", {
     port: config.port,
     host: config.host,
     command: config.stdioCommand,
