@@ -1,0 +1,10 @@
+services:
+  brave-mcp:
+    image: ghcr.io/onprem-ai/mcp-key-proxy:latest
+    command:
+      - "--stdio"
+      - "npx -y @brave/brave-search-mcp-server"
+      - "--header-to-env"
+      - "x-api-key=BRAVE_API_KEY"
+    ports:
+      - "8000:8000"
