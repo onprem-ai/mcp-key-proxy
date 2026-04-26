@@ -30,18 +30,18 @@ mcp-key-proxy fills the gap: Streamable HTTP + header-to-env + keyed process poo
 
 ## Quick Start: Brave Search MCP
 
+The generic `mcp-key-proxy` Docker image wraps any stdio MCP server. Use `--stdio "npx -y <package>"` to pull and run it at container start.
+
 **docker-compose.yml**
 
 ```yaml
 services:
   brave-mcp:
-    build: .
-    # Or use a pre-built image:
-    # image: ghcr.io/your-org/mcp-key-proxy:latest
+    image: ghcr.io/digilac/mcp-key-proxy:latest
     command:
-      # The stdio MCP server to wrap
+      # The stdio MCP server to wrap — npx pulls it on first start
       - "--stdio"
-      - "brave-search-mcp-server"
+      - "npx -y @brave/brave-search-mcp-server"
       # Map HTTP header → env var for the child process
       # Clients send: x-api-key: <their-brave-key>
       # Child receives: BRAVE_API_KEY=<their-brave-key>
@@ -67,6 +67,18 @@ services:
       interval: 10s
       timeout: 5s
       retries: 3
+```
+
+Works with any stdio MCP server — just change `--stdio` and `--header-to-env`:
+
+```yaml
+# GitHub MCP server
+command:
+  - "--stdio"
+  - "npx -y @modelcontextprotocol/server-github"
+  - "--header-to-env"
+  - "x-github-token=GITHUB_TOKEN"
+  # ...
 ```
 
 ```bash
