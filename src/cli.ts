@@ -14,7 +14,7 @@ program
   .description(
     "Streamable HTTP proxy for stdio MCP servers with per-request API key injection via headers",
   )
-  .version("0.3.0")
+  .version("0.4.0")
   .requiredOption("--stdio <command>", "Shell command to spawn the stdio MCP server")
   .option(
     "--header-to-env <mapping>",

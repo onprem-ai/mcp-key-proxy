@@ -375,7 +375,7 @@ npx github:onprem-ai/mcp-key-proxy \
   --header-to-env "x-api-key=BRAVE_API_KEY"
 
 # Pinned version
-npx github:onprem-ai/mcp-key-proxy#v0.3.0 \
+npx github:onprem-ai/mcp-key-proxy#v0.4.0 \
   --stdio "npx -y @brave/brave-search-mcp-server" \
   --header-to-env "x-api-key=BRAVE_API_KEY"
 ```
