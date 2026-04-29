@@ -300,6 +300,8 @@ Client (POST /mcp)              mcp-key-proxy              stdio MCP server
 | `--queue-timeout <n>` | 30 | Max seconds to wait when pool is full |
 | `--debug` | false | Verbose JSON logging to stderr |
 | `--cors <origin>` | *(none)* | CORS allowed origin. Repeatable. |
+| `--api-key <key>` | *(none)* | Require clients to send this static key via `Authorization: Bearer <key>`. Env: `API_KEY` |
+| `--api-key-sha256 <hex>` | *(none)* | Same as above but accepts a SHA-256 hex digest instead of the clear-text key. Env: `API_KEY_SHA256` |
 
 ### Header mapping examples
 
@@ -313,6 +315,24 @@ Client (POST /mcp)              mcp-key-proxy              stdio MCP server
 # Multiple mappings (repeatable)
 --header-to-env "x-api-key=API_KEY" --header-to-env "x-org-id=ORG_ID"
 ```
+
+### Static API key
+
+If you want a shared secret that all clients must provide (independent of `--header-to-env`), use `--api-key` or `--api-key-sha256`. Clients pass it via `Authorization: Bearer <key>`. Requests without a valid key get a 401.
+
+```bash
+# Clear text (dev/testing — visible in ps)
+--api-key "sk-my-secret"
+
+# SHA-256 hash (production — secret never in CLI args)
+--api-key-sha256 "$(echo -n 'sk-my-secret' | sha256sum | cut -d' ' -f1)"
+
+# Or via environment variables
+API_KEY=sk-my-secret
+API_KEY_SHA256=a1b2c3...
+```
+
+The two flags are mutually exclusive. This gate runs before header extraction — rejected requests never touch the process pool.
 
 ## Endpoints
 
@@ -355,17 +375,32 @@ npx github:onprem-ai/mcp-key-proxy \
   --header-to-env "x-api-key=BRAVE_API_KEY"
 
 # Pinned version
-npx github:onprem-ai/mcp-key-proxy#v0.1.0 \
+npx github:onprem-ai/mcp-key-proxy#v0.2.0 \
   --stdio "npx -y @brave/brave-search-mcp-server" \
   --header-to-env "x-api-key=BRAVE_API_KEY"
 ```
+
+## Security
+
+- **Process isolation** — each unique set of credentials gets its own pool of child processes. No credential mixing between tenants.
+- **Clean environment** — child processes inherit only safe system variables (`PATH`, `HOME`, `TMPDIR`, `USER`, `LANG`). No leaking of host env vars.
+- **Header injection prevention** — header values containing newlines, carriage returns, or null bytes are rejected (400).
+- **Timing-safe key comparison** — static API key checks use constant-time comparison via `crypto.timingSafeEqual`. Both plain-text and hashed modes normalize to SHA-256 before comparing, preventing length-based timing leaks.
+- **No credential logging** — API keys and header values are never written to logs. Auth failures log the event, not the submitted value.
+- **Opaque error responses** — authentication failures return a generic 401 without revealing whether the key was missing, malformed, or wrong.
+
+**Production recommendations:**
+
+- Use `--api-key-sha256` (or `API_KEY_SHA256` env var) instead of `--api-key` to avoid exposing the secret in process listings.
+- Put a reverse proxy (nginx, Caddy) in front for TLS termination and rate limiting.
+- Report vulnerabilities to **security@digilac.ch** (see [SECURITY.md](SECURITY.md)).
 
 ## Development
 
 ```bash
 npm install
 npm run build
-npm test          # 39 tests
+npm test          # 59 tests
 npm run dev       # Run with tsx (no build needed)
 ```
 

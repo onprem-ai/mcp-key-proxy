@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-04-29
+
+### Added
+
+- Static API key authentication via `--api-key` (clear text) and `--api-key-sha256` (hashed)
+- Environment variable alternatives: `API_KEY` and `API_KEY_SHA256`
+- Timing-safe key comparison (SHA-256 both sides to prevent length leaks)
+- Bearer token trimming for robustness
+- Auth gate on all `/mcp` endpoints (POST, GET, DELETE)
+- CORS support for `Authorization` header
+- 20 unit tests for the auth layer
+
 ## [0.1.0] - 2026-04-26
 
 ### Added

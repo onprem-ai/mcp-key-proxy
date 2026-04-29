@@ -3,6 +3,7 @@
 import { Command } from "commander";
 import { createApp } from "./server.js";
 import { parseHeaderMappings } from "./header-extractor.js";
+import { validateApiKeyConfig } from "./api-key-auth.js";
 import { setLogLevel, log } from "./logger.js";
 import type { Config } from "./types.js";
 
@@ -13,7 +14,7 @@ program
   .description(
     "Streamable HTTP proxy for stdio MCP servers with per-request API key injection via headers",
   )
-  .version("0.1.0")
+  .version("0.2.0")
   .requiredOption("--stdio <command>", "Shell command to spawn the stdio MCP server")
   .option(
     "--header-to-env <mapping>",
@@ -32,7 +33,9 @@ program
     "CORS allowed origin. Repeatable.",
     (val: string, prev: string[]) => [...prev, val],
     [] as string[],
-  );
+  )
+  .option("--api-key <key>", "Static API key (clear text). Env: API_KEY")
+  .option("--api-key-sha256 <hex>", "Static API key (SHA-256 hex digest). Env: API_KEY_SHA256");
 
 program.parse();
 
@@ -64,7 +67,16 @@ const config: Config = {
   queueTimeoutSeconds: parseInt(opts.queueTimeout, 10),
   debug: opts.debug,
   corsOrigins: opts.cors,
+  apiKey: opts.apiKey || process.env.API_KEY,
+  apiKeySha256: opts.apiKeySha256 || process.env.API_KEY_SHA256,
 };
+
+try {
+  validateApiKeyConfig(config);
+} catch (err) {
+  console.error((err as Error).message);
+  process.exit(1);
+}
 
 const { app, poolManager } = createApp(config);
 
@@ -76,6 +88,7 @@ const server = app.listen(config.port, config.host, () => {
     mappings: headerMappings.map((m) => `${m.headerName}→${m.envVar}`),
     poolSize: config.poolSize,
     ttlSeconds: config.ttlSeconds,
+    apiKeyAuth: config.apiKey ? "plain" : config.apiKeySha256 ? "sha256" : "disabled",
   });
 });
 

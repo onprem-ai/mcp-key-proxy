@@ -7,6 +7,7 @@ import {
   MissingHeaderError,
   InvalidHeaderError,
 } from "./header-extractor.js";
+import { checkApiKey } from "./api-key-auth.js";
 import { log } from "./logger.js";
 import type { Config, HealthResponse, JsonRpcRequest } from "./types.js";
 
@@ -27,7 +28,7 @@ export function createApp(config: Config) {
       corsMiddleware({
         origin: config.corsOrigins.includes("*") ? true : config.corsOrigins,
         methods: ["GET", "POST", "DELETE", "OPTIONS"],
-        allowedHeaders: ["Content-Type", "Mcp-Session-Id", ...config.headerMappings.map((m) => m.headerName)],
+        allowedHeaders: ["Content-Type", "Authorization", "Mcp-Session-Id", ...config.headerMappings.map((m) => m.headerName)],
         exposedHeaders: ["Mcp-Session-Id"],
       }),
     );
@@ -47,6 +48,11 @@ export function createApp(config: Config) {
 
   // MCP Streamable HTTP endpoint
   app.post("/mcp", async (req, res) => {
+    if (!checkApiKey(req.headers.authorization, config)) {
+      res.status(401).json({ error: "Invalid API key" });
+      return;
+    }
+
     const reqStart = Date.now();
     let poolKey: string | undefined;
 
@@ -177,12 +183,21 @@ export function createApp(config: Config) {
   });
 
   // GET /mcp — SSE for server-initiated notifications (not supported in v1)
-  app.get("/mcp", (_req, res) => {
+  app.get("/mcp", (req, res) => {
+    if (!checkApiKey(req.headers.authorization, config)) {
+      res.status(401).json({ error: "Invalid API key" });
+      return;
+    }
     res.status(405).json({ error: "GET /mcp not supported in v1" });
   });
 
   // DELETE /mcp — session cleanup
   app.delete("/mcp", (req, res) => {
+    if (!checkApiKey(req.headers.authorization, config)) {
+      res.status(401).json({ error: "Invalid API key" });
+      return;
+    }
+
     const sessionId = req.headers["mcp-session-id"] as string | undefined;
     if (sessionId && sessions.has(sessionId)) {
       sessions.delete(sessionId);

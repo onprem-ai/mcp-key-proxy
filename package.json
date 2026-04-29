@@ -1,6 +1,6 @@
 {
   "name": "mcp-key-proxy",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Streamable HTTP proxy for stdio MCP servers with per-request API key injection via headers",
   "type": "module",
   "bin": {

@@ -13,6 +13,8 @@ export interface Config {
   queueTimeoutSeconds: number;
   debug: boolean;
   corsOrigins: string[];
+  apiKey?: string;
+  apiKeySha256?: string;
 }
 
 export interface PoolStats {
